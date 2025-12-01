@@ -3,24 +3,32 @@ class Service {
     this.dao = dao;
   }
 
-  getAll = async () => {
-    return await this.dao.getAll();
+  listarCorredores = async () => {
+    return await this.dao.listarCorredores();
   };
 
-  getById = async (id) => {
-    return await this.dao.getById(id);
-  };
+  procesarCorredor = async (corredor) => {
+    const existente = await this.dao.buscarCorredorPorId(corredor.id);
+    if (existente) {
+      await this.dao.actualizar(
+        corredor.id,
+        corredor.latitud,
+        corredor.longitud
+      );
+    } else {
+      await this.dao.crear(corredor);
+    }
 
-  create = async (data) => {
-    return await this.dao.create(data);
-  };
+    const alertas = await this.dao.corredoresEnPeligro(corredor);
 
-  update = async (id, newData) => {
-    return await this.dao.update(id, newData);
-  };
+    const tipo = existente ? "actualizado" : "creado";
 
-  delete = async (id) => {
-    return await this.dao.delete(id);
+    const respuesta = {
+      tipo: tipo,
+      corredor: corredor,
+      alertas: alertas,
+    };
+    return respuesta;
   };
 }
 

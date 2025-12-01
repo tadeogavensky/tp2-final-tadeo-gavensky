@@ -1,55 +1,37 @@
-// validar campos de data
+//1.B Validaciones: id de 6 caracteres alfanuméricos, latitud y longitud numéricas.
 
-import { validateCoordinates, validateId } from "../utils/data.js";
+import { validarCoordenadas, validarId } from "../utils.js";
 
-export const validateData = (req, res, next) => {
-  const { id, xa, ya, za } = req.body;
+export const validarDatosPost = (req, res, next) => {
+  console.log("Validando datos del POST /corredores");
 
-  if (!id || !xa || !ya || !za) {
-    return res.status(400).json({ error: "datos no válidos" });
+  const { id, latitud, longitud } = req.body;
+  const missingFields = [];
+
+  if (!id) missingFields.push("id");
+  if (!latitud && latitud !== 0) missingFields.push("latitud");
+  if (!longitud && longitud !== 0) missingFields.push("longitud");
+
+  if (missingFields.length > 0) {
+    return res
+      .status(400)
+      .json({ errorMsg: "Faltan campos: " + missingFields.join(", ") });
   }
 
-  if (!validateId(id)) {
-    return res.status(400).json({ error: "id no válido" });
+  if (!validarId(id)) {
+    return res
+      .status(400)
+      .json({
+        errorMsg: "ID debe estar formado por 6 caracteres alfanuméricos.",
+      });
   }
 
-  if (!validateCoordinates(xa, ya, za)) {
-    return res.status(400).json({ error: "coordenadas no válidas" });
+  if (!validarCoordenadas(latitud, longitud)) {
+    return res
+      .status(400)
+      .json({ errorMsg: "Latitud y longitud deben ser valores numéricos." });
   }
 
   next();
 };
 
-export const validateIdParam = (req, res, next) => {
-  const { id } = req.params;
-
-  if (!validateId(id)) {
-    return res.status(400).json({ error: "id no válido" });
-  }
-  next();
-};
-
-export const validateCoordinatesBody = (req, res, next) => {
-  const { xa, ya, za } = req.body;
-
-  if (!validateCoordinates(xa, ya, za)) {
-    return res.status(400).json({ error: "coordenadas no válidas" });
-  }
-  next();
-};
-
-/* {
-  id: "AAB001",
-  xa: 7500,
-  ya: 6200,
-  za: 1000
-},
- */
-
-/* 
-
-Realizar las validaciones necesarias para recibir un valor alfanumérico de 6 dígitos en id y 
-valores numéricos en las coordenadas. En caso de NO cumplir con los valores 
-estipulados para cada campo se debe retornar el mensaje: “datos no válidos” en el 
-formato que se pide más abajo.
-*/

@@ -1,14 +1,13 @@
 import { Router } from "express";
 import controller from "../container/container.js";
-import { validateCoordinatesBody, validateData, validateIdParam } from "../middlewares/middleware.js";
+import { validarDatosPost } from "../middlewares/middleware.js";
 
 const router = Router();
 
-router.get("/data", controller.getAll);
-router.get("/data/:id", validateIdParam, controller.getById);
-router.post("/data", validateData, controller.create);
-router.put("/data/:id", validateIdParam, validateCoordinatesBody, controller.update);
-router.delete("/data/:id", validateIdParam, controller.delete);
+// Punto 1A y 1B
+router.post("/corredores", validarDatosPost, controller.procesarCorredor);
 
+// Punto 2
+router.get("/corredores", controller.listarCorredores);
 
 export default router;
